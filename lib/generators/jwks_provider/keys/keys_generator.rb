@@ -7,9 +7,9 @@ require "openssl"
 module JwksProvider
   module Generators
     class KeysGenerator < Rails::Generators::Base
-      desc "Generates RSA private/public key pairs for staging and production environments."
+      desc "Generates EC (prime256v1) key pairs for staging and production environments."
 
-      KEY_BITS = 2048
+      EC_CURVE = "prime256v1"
       ENVS = %w[staging production].freeze
 
       def generate_key_pairs
@@ -22,12 +22,12 @@ module JwksProvider
             next
           end
 
-          say "Generating #{env} RSA #{KEY_BITS}-bit key pair...", :green
+          say "Generating #{env} EC #{EC_CURVE} key pair...", :green
 
-          rsa_key = OpenSSL::PKey::RSA.generate(KEY_BITS)
+          ec_key = OpenSSL::PKey::EC.generate(EC_CURVE)
 
-          create_file private_key_path, rsa_key.to_pem
-          create_file public_key_path,  rsa_key.public_key.to_pem
+          create_file private_key_path, ec_key.to_pem
+          create_file public_key_path,  ec_key.public_to_pem
         end
       end
     end
