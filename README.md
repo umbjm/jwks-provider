@@ -1,6 +1,6 @@
 # jwks-provider
 
-A Rails gem for managing **JWKS (JSON Web Key Set)** operations. It generates RSA private/public key pairs for **staging** and **production** environments, exposes a `JsonWebKey` controller concern, and automatically wires up the `/.well-known/jwks` endpoint.
+A Rails gem for managing **JWKS (JSON Web Key Set)** operations. It generates EC (prime256v1) key pairs for **staging** and **production** environments, exposes a `JsonWebKey` controller concern, and automatically wires up the `/.well-known/jwks` endpoint.
 
 Built on top of [`jwt`](https://rubygems.org/gems/jwt).
 
@@ -57,10 +57,10 @@ This single command will:
 
 | File | Description |
 |------|-------------|
-| `staging/enc_key.pem`    | RSA-2048 private key for staging |
-| `staging/sig_key.pem`     | RSA-2048 public key for staging |
-| `production/enc_key.pem` | RSA-2048 private key for production |
-| `production/sig_key.pem`  | RSA-2048 public key for production |
+| `staging/enc_key.pem`    | EC prime256v1 private key for staging |
+| `staging/sig_key.pem`     | EC prime256v1 public key for staging |
+| `production/enc_key.pem` | EC prime256v1 private key for production |
+| `production/sig_key.pem`  | EC prime256v1 public key for production |
 
 ### `app/controllers/concerns/json_web_key.rb`
 

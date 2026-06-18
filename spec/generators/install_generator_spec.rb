@@ -12,7 +12,8 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
   let(:tmpdir) { Dir.mktmpdir }
 
   let(:generator) do
-    g = JwksProvider::Generators::InstallGenerator.new([], {}, destination_root: tmpdir)
+    g = JwksProvider::Generators::InstallGenerator.new([], { app_name: "my-app" }, destination_root: tmpdir)
+    g.set_app_name
     g
   end
 
@@ -55,6 +56,11 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
       expect(content).not_to include("<%=")
     end
 
+    it "interpolates app_name into kid_sig_key" do
+      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
+      expect(content).to include("alias/my-app-id-token-")
+    end
+
     it "includes kid_sig_key referencing signing-key-kms-asymmetric-key" do
       content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
       expect(content).to include("signing-key-kms-asymmetric-key")
@@ -86,6 +92,13 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
     it "defines JwksController" do
       content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
       expect(content).to include("class JwksController")
+    end
+  end
+
+  describe "#set_app_name" do
+    it "raises Thor::Error when app_name is blank" do
+      g = JwksProvider::Generators::InstallGenerator.new([], { app_name: "" }, destination_root: tmpdir)
+      expect { g.set_app_name }.to raise_error(Thor::Error, /app_name cannot be blank/)
     end
   end
 
