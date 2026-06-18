@@ -8,10 +8,19 @@ module JwksProvider
     class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
 
-      desc "Installs jwks-provider: generates RSA key pairs, controller concern, controller, and route."
+      desc "Installs jwks-provider: generates EC key pairs, controller concern, controller, and route."
+
+      class_option :app_name,
+                   type: :string,
+                   desc: "Application name used in KID aliases (e.g. my-app → alias/my-app-id-token-...)"
+
+      def set_app_name
+        @app_name = options[:app_name] || ask("Enter application name for KID aliases (e.g. my-app):")
+        raise Thor::Error, "app_name cannot be blank" if @app_name.strip.empty?
+      end
 
       def generate_keys
-        say "Generating RSA key pairs for staging and production...", :green
+        say "Generating EC key pairs for staging and production...", :green
         invoke "jwks_provider:keys"
       end
 
