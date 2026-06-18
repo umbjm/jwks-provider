@@ -2,7 +2,7 @@
 
 A Rails gem for managing **JWKS (JSON Web Key Set)** operations. It generates RSA private/public key pairs for **staging** and **production** environments, exposes a `JsonWebKey` controller concern, and automatically wires up the `/.well-known/jwks` endpoint.
 
-Built on top of [`jwt`](https://rubygems.org/gems/jwt) and [`jose`](https://rubygems.org/gems/jose).
+Built on top of [`jwt`](https://rubygems.org/gems/jwt).
 
 ## Installation
 
