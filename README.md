@@ -9,7 +9,7 @@ Built on top of [`jwt`](https://rubygems.org/gems/jwt).
 Add to your application's `Gemfile`:
 
 ```ruby
-gem "jwks-provider"
+gem "jwks-provider", git: "https://github.com/umbjm/jwks-provider"
 ```
 
 Then run:
