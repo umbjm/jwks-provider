@@ -29,19 +29,19 @@ RSpec.describe JwksProvider::Generators::KeysGenerator do
       end
     end
 
-    it "generates valid RSA PEM content in enc_key.pem" do
+    it "generates valid EC PEM content in enc_key.pem" do
       run_keys_generator(tmpdir)
 
       %w[staging production].each do |env|
         pem = File.read(File.join(tmpdir, "config/keys/#{env}/enc_key.pem"))
-        expect { OpenSSL::PKey::RSA.new(pem) }.not_to raise_error
+        expect { OpenSSL::PKey::EC.new(pem) }.not_to raise_error
       end
     end
 
     it "skips generation if enc_key.pem already exists" do
       dir = File.join(tmpdir, "config/keys/staging")
       FileUtils.mkdir_p(dir)
-      existing_key = OpenSSL::PKey::RSA.generate(2048).to_pem
+      existing_key = OpenSSL::PKey::EC.generate("prime256v1").to_pem
       File.write(File.join(dir, "enc_key.pem"), existing_key)
 
       run_keys_generator(tmpdir)
@@ -49,12 +49,12 @@ RSpec.describe JwksProvider::Generators::KeysGenerator do
       expect(File.read(File.join(dir, "enc_key.pem"))).to eq(existing_key)
     end
 
-    it "generates a 2048-bit RSA key" do
+    it "generates a prime256v1 EC key" do
       run_keys_generator(tmpdir)
 
       pem = File.read(File.join(tmpdir, "config/keys/staging/enc_key.pem"))
-      key = OpenSSL::PKey::RSA.new(pem)
-      expect(key.n.num_bits).to eq(2048)
+      key = OpenSSL::PKey::EC.new(pem)
+      expect(key.group.curve_name).to eq("prime256v1")
     end
   end
 end
