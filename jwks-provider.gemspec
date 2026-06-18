@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "jwk", "~> 0.3"
+  spec.add_dependency "jwt", "~> 3.2"
   spec.add_dependency "jose", "~> 1.2"
 
   # For more information and examples about making a new gem, check out our
