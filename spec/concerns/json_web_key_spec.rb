@@ -11,9 +11,9 @@ RSpec.describe "JsonWebKey concern" do
   let(:enc_key)  { OpenSSL::PKey::EC.generate("prime256v1") }
 
   let(:concern_class) do
-    sig_pem = sig_key.to_pem
-    enc_pem = enc_key.to_pem
-    dir     = tmpdir
+    sig_key.to_pem
+    enc_key.to_pem
+    tmpdir
 
     klass = Class.new do
       def initialize(env, root)

@@ -33,7 +33,7 @@ jobs:
         run: bundle exec rspec
 
   lint:
-    name: RuboCop
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -46,5 +46,5 @@ jobs:
           ruby-version: "4.0"
           bundler-cache: true
 
-      - name: Run RuboCop
+      - name: Run Rubocop
         run: bundle exec rubocop --parallel

@@ -94,12 +94,12 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
 
     it "injects the .well-known/jwks route" do
       content = File.read(File.join(tmpdir, "config/routes.rb"))
-      expect(content).to include('.well-known/jwks')
+      expect(content).to include(".well-known/jwks")
     end
 
     it "routes to jwks#index" do
       content = File.read(File.join(tmpdir, "config/routes.rb"))
-      expect(content).to include('jwks#index')
+      expect(content).to include("jwks#index")
     end
   end
 end
