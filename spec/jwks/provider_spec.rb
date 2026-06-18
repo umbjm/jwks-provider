@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Jwks::Provider do
+RSpec.describe JwksProvider do
   it "has a version number" do
-    expect(Jwks::Provider::VERSION).not_to be nil
+    expect(JwksProvider::VERSION).not_to be_nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "version is a valid semver string" do
+    expect(JwksProvider::VERSION).to match(/\A\d+\.\d+\.\d+\z/)
   end
 end

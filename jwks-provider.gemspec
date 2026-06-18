@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/jwks/provider/version"
+require_relative "lib/jwks_provider/version"
 
 Gem::Specification.new do |spec|
   spec.name = "jwks-provider"
-  spec.version = Jwks::Provider::VERSION
+  spec.version = JwksProvider::VERSION
   spec.authors = ["wafihfzhn"]
   spec.email = ["hafizhuddin96@gmail.com"]
 
@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "jwt", "~> 3.2"
-  spec.add_dependency "jose", "~> 1.2"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://guides.rubygems.org/make-your-own-gem/

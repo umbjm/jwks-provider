@@ -53,6 +53,25 @@ This single command will:
 
 ## Generated Files
 
+### `config/keys/`
+
+| File | Description |
+|------|-------------|
+| `staging/enc_key.pem`    | RSA-2048 private key for staging |
+| `staging/sig_key.pem`     | RSA-2048 public key for staging |
+| `production/enc_key.pem` | RSA-2048 private key for production |
+| `production/sig_key.pem`  | RSA-2048 public key for production |
+
+### `app/controllers/concerns/json_web_key.rb`
+
+Include this concern in any controller that needs to verify JWTs:
+
+```ruby
+class ApiController < ApplicationController
+  include JsonWebKey
+end
+```
+
 ### `app/controllers/jwks_controller.rb`
 
 Serves the public key set at `/.well-known/jwks`. No additional configuration needed.
@@ -65,7 +84,7 @@ rake spec      # run tests
 bin/console    # interactive prompt
 ```
 
-To release a new version, update `lib/jwks/provider/version.rb` and run `bundle exec rake release`.
+To release a new version, update `lib/jwks_provider/version.rb` and run `bundle exec rake release`.
 
 ## Contributing
 
