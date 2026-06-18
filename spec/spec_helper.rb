@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "jwks/provider"
+require "jwks_provider/version"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

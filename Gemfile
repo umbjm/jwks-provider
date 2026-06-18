@@ -8,6 +8,9 @@ gemspec
 gem "irb"
 gem "rake", "~> 13.0"
 
+gem "railties", "~> 7.0"
 gem "rspec", "~> 3.0"
+gem "rspec-rails", "~> 6.0"
 
+gem "rubocop-rails-omakase", require: false
 gem "rubocop", "~> 1.21"

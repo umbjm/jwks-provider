@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class JwksController < ApplicationController
-  skip_before_action :verify_authenticity_token, raise: false
-  skip_before_action :authenticate_user!, raise: false
+  include JsonWebKey
 
   def index
-    render json: JwksProvider::KeySet.public_jwks(Rails.env)
+    render json: sig_key_set
   end
 end

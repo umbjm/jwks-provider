@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative "lib/jwks/provider/version"
+require_relative "lib/jwks_provider/version"
 
 Gem::Specification.new do |spec|
   spec.name = "jwks-provider"
-  spec.version = Jwks::Provider::VERSION
-  spec.authors = ["wafihfzhn"]
-  spec.email = ["hafizhuddin96@gmail.com"]
+  spec.version = JwksProvider::VERSION
+  spec.authors = [ "wafihfzhn" ]
+  spec.email = [ "hafizhuddin96@gmail.com" ]
 
   spec.summary = "A Ruby gem for managing JWKS (JSON Web Key Set) operations."
   spec.description = "A Ruby gem for managing JWKS (JSON Web Key Set) operations, including key generation, retrieval, and validation."
@@ -33,10 +33,9 @@ Gem::Specification.new do |spec|
   end
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = [ "lib" ]
 
-  spec.add_dependency "jwk", "~> 0.3"
-  spec.add_dependency "jose", "~> 1.2"
+  spec.add_dependency "jwt", "~> 3.2"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://guides.rubygems.org/make-your-own-gem/
