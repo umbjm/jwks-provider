@@ -20,7 +20,16 @@ module JwksProvider
     end
 
     def encryption_key
-      OpenSSL::PKey.read ENV["ENC_KEY"]
+      enc_key = ENV["ENC_KEY"]
+      raise "ENC_KEY environment variable is not set" if enc_key.nil?
+
+      begin
+        decoded_key = Base64.strict_decode64(enc_key)
+      rescue ArgumentError
+        raise "ENC_KEY must be a valid base64-encoded string"
+      end
+
+      OpenSSL::PKey.read decoded_key
     end
 
     private
