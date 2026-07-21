@@ -8,7 +8,7 @@ module JwksProvider
     class InstallGenerator < Rails::Generators::Base
       source_root File.expand_path("templates", __dir__)
 
-      desc "Installs jwks-provider: generates EC key pairs, controller concern, controller, and route."
+      desc "Installs jwks-provider: generates EC key pairs, initializer, controller, and route."
 
       class_option :app_name,
                    type: :string,
@@ -24,8 +24,14 @@ module JwksProvider
         invoke "jwks_provider:keys"
       end
 
-      def copy_concern
-        template "json_web_key.rb", "app/controllers/concerns/json_web_key.rb"
+      def create_initializer
+        create_file "config/initializers/jwks_provider.rb" do
+          <<~RUBY
+            # frozen_string_literal: true
+
+            JwksProvider.app_name = "#{@app_name}"
+          RUBY
+        end
       end
 
       def copy_controller

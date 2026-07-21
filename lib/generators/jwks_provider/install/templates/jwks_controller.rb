@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class JwksController < ApplicationController
-  include JsonWebKey
+  include JwksProvider::JsonWebKey
 
   def index
-    render json: sig_key_set
+    render json: keys_set
   end
 end
