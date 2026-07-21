@@ -31,11 +31,11 @@ module JwksProvider
       end
 
       def copy_controller
-        template "jwks_controller.rb", "app/controllers/jwks_controller.rb"
+        template "well_known_controller.rb", "app/controllers/well_known_controller.rb"
       end
 
       def inject_routes
-        route 'get ".well-known/jwks", to: "jwks#index"'
+        route 'get ".well-known/jwks", to: "well_known#jwks"'
       end
     end
   end
