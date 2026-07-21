@@ -40,23 +40,28 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
   describe "#copy_controller" do
     before { generator.copy_controller }
 
-    it "creates jwks_controller.rb in app/controllers/" do
-      expect(File).to exist(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
+    it "creates well_known_controller.rb in app/controllers/" do
+      expect(File).to exist(File.join(tmpdir, "app/controllers/well_known_controller.rb"))
     end
 
     it "includes JwksProvider::JsonWebKey concern" do
-      content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
+      content = File.read(File.join(tmpdir, "app/controllers/well_known_controller.rb"))
       expect(content).to include("include JwksProvider::JsonWebKey")
     end
 
     it "renders keys_set as JSON" do
-      content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
+      content = File.read(File.join(tmpdir, "app/controllers/well_known_controller.rb"))
       expect(content).to include("render json: keys_set")
     end
 
-    it "defines JwksController" do
-      content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
-      expect(content).to include("class JwksController")
+    it "defines WellKnownController" do
+      content = File.read(File.join(tmpdir, "app/controllers/well_known_controller.rb"))
+      expect(content).to include("class WellKnownController")
+    end
+
+    it "defines jwks method" do
+      content = File.read(File.join(tmpdir, "app/controllers/well_known_controller.rb"))
+      expect(content).to include("def jwks")
     end
   end
 
@@ -75,9 +80,9 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
       expect(content).to include(".well-known/jwks")
     end
 
-    it "routes to jwks#index" do
+    it "routes to well_known#jwks" do
       content = File.read(File.join(tmpdir, "config/routes.rb"))
-      expect(content).to include("jwks#index")
+      expect(content).to include("well_known#jwks")
     end
   end
 end
