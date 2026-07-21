@@ -6,7 +6,7 @@ module JwksProvider
   module JsonWebKey
     extend ActiveSupport::Concern
 
-    def sig_key_set
+    def keys_set
       {
         "keys": [
           JWT::JWK.new(signing_key, kid: kid_sig_key, use: "sig", alg: "ES256").export,
