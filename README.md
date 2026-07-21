@@ -98,10 +98,19 @@ end
 ### Key loading
 
 - **Signing key** — read from `config/keys/sig_key_#{kid_alias}.pem` (e.g. `sig_key_stg.pem` in non-production, `sig_key_prd.pem` in production).
-- **Encryption key** — read from the `ENC_KEY` environment variable. Make sure to set this in your environment:
+- **Encryption key** — read from the `ENC_KEY` environment variable. The key must be **base64-encoded** before being stored in the environment variable to ensure consistency across different environments and platforms.
+
+To set the encryption key:
 
 ```bash
-export ENC_KEY="-----BEGIN EC PRIVATE KEY-----..."
+# Base64 encode your PEM file
+export ENC_KEY=$(cat config/keys/enc_key_stg.pem | base64)
+```
+
+Or manually encode it:
+
+```bash
+export ENC_KEY="LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tC..."
 ```
 
 ## Development
