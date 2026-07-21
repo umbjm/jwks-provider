@@ -107,6 +107,116 @@ RSpec.describe "JsonWebKey concern" do
       obj = concern_class.new("staging", tmpdir)
       expect(obj.encryption_key).to be_a(OpenSSL::PKey::PKey)
     end
+
+    context "when testing base64 encoding/decoding preserves newlines" do
+      let(:test_key) { OpenSSL::PKey::EC.generate("prime256v1") }
+      let(:pem_content) { test_key.to_pem }
+
+      it "base64 encoded string does not contain newlines" do
+        # Use strict_encode64 which does not add newlines
+        base64_encoded = Base64.strict_encode64(pem_content)
+
+        # The encoded string should not contain \n characters
+        expect(base64_encoded).not_to include("\n")
+      end
+
+      it "preserves original bytes including newlines after base64 decode" do
+        # Encode the PEM content to base64
+        base64_encoded = Base64.strict_encode64(pem_content)
+
+        # Decode it back
+        decoded_content = Base64.strict_decode64(base64_encoded)
+
+        # The decoded content should match the original exactly
+        expect(decoded_content).to eq(pem_content)
+      end
+
+      it "can load the key after base64 encode/decode cycle" do
+        # Simulate storing in environment variable as base64
+        base64_encoded = Base64.strict_encode64(pem_content)
+        decoded_content = Base64.strict_decode64(base64_encoded)
+
+        # Should be able to load the key successfully
+        loaded_key = OpenSSL::PKey.read(decoded_content)
+        expect(loaded_key).to be_a(OpenSSL::PKey::EC)
+        expect(loaded_key.to_pem).to eq(pem_content)
+      end
+
+      it "handles PEM with proper line breaks after base64 decode" do
+        # PEM files have specific line breaks (64 chars per line)
+        # Base64 encoding should preserve these
+        base64_encoded = Base64.strict_encode64(pem_content)
+        decoded_content = Base64.strict_decode64(base64_encoded)
+
+        # Check that the decoded content has proper PEM structure
+        expect(decoded_content).to start_with("-----BEGIN")
+        expect(decoded_content).to end_with("-----END")
+        expect(decoded_content).to include("\n")
+
+        # Should be parseable by OpenSSL
+        expect { OpenSSL::PKey.read(decoded_content) }.not_to raise_error
+      end
+    end
+
+    context "when testing the actual module implementation" do
+      let(:test_key) { OpenSSL::PKey::EC.generate("prime256v1") }
+      let(:pem_content) { test_key.to_pem }
+      let(:base64_encoded) { Base64.strict_encode64(pem_content) }
+
+      before do
+        # Stub ENV and Rails
+        allow(ENV).to receive(:[]).with("ENC_KEY").and_return(base64_encoded)
+        allow(Rails).to receive(:root).and_return(Pathname.new(tmpdir))
+        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("staging"))
+      end
+
+      it "decodes base64 and loads the key successfully" do
+        # Create a class that includes the actual concern
+        klass = Class.new do
+          include JwksProvider::JsonWebKey
+
+          def self.app_name
+            "my-app"
+          end
+        end
+
+        obj = klass.new
+        loaded_key = obj.encryption_key
+
+        expect(loaded_key).to be_a(OpenSSL::PKey::EC)
+        expect(loaded_key.to_pem).to eq(pem_content)
+      end
+
+      it "raises error when ENC_KEY is not set" do
+        allow(ENV).to receive(:[]).with("ENC_KEY").and_return(nil)
+
+        klass = Class.new do
+          include JwksProvider::JsonWebKey
+
+          def self.app_name
+            "my-app"
+          end
+        end
+
+        obj = klass.new
+        expect { obj.encryption_key }.to raise_error("ENC_KEY environment variable is not set")
+      end
+
+      it "raises error when ENC_KEY is not valid base64" do
+        allow(ENV).to receive(:[]).with("ENC_KEY").and_return("not-valid-base64!!!")
+
+        klass = Class.new do
+          include JwksProvider::JsonWebKey
+
+          def self.app_name
+            "my-app"
+          end
+        end
+
+        obj = klass.new
+        expect { obj.encryption_key }.to raise_error("ENC_KEY must be a valid base64-encoded string")
+      end
+    end
   end
 
   describe "#sig_key_set" do
