@@ -4,6 +4,7 @@ require "spec_helper"
 require "openssl"
 require "tmpdir"
 require "jwt"
+require "jwks_provider/json_web_key"
 
 RSpec.describe "JsonWebKey concern" do
   let(:tmpdir) { Dir.mktmpdir }
@@ -150,7 +151,7 @@ RSpec.describe "JsonWebKey concern" do
 
         # Check that the decoded content has proper PEM structure
         expect(decoded_content).to start_with("-----BEGIN")
-        expect(decoded_content).to end_with("-----END")
+        expect(decoded_content.strip).to end_with("-----END EC PRIVATE KEY-----")
         expect(decoded_content).to include("\n")
 
         # Should be parseable by OpenSSL
