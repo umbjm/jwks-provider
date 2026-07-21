@@ -25,13 +25,9 @@ module JwksProvider
       end
 
       def create_initializer
-        create_file "config/initializers/jwks_provider.rb" do
-          <<~RUBY
-            # frozen_string_literal: true
-
-            JwksProvider.app_name = "#{@app_name}"
-          RUBY
-        end
+        create_file "config/initializers/jwks_provider.rb", <<~RUBY
+          JwksProvider.app_name = "#{@app_name}"
+        RUBY
       end
 
       def copy_controller
