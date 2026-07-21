@@ -10,12 +10,12 @@ module JwksProvider
       desc "Generates EC (prime256v1) key pairs for staging and production environments."
 
       EC_CURVE = "prime256v1"
-      ENVS = %w[staging production].freeze
+      ENVS = %w[stg prd].freeze
 
       def generate_key_pairs
         ENVS.each do |env|
-          private_key_path = "config/keys/#{env}/enc_key.pem"
-          public_key_path  = "config/keys/#{env}/sig_key.pem"
+          private_key_path = "config/keys/enc_key_#{env}.pem"
+          public_key_path  = "config/keys/sig_key_#{env}.pem"
 
           if File.exist?(private_key_path)
             say "Skipping #{env}: #{private_key_path} already exists.", :yellow

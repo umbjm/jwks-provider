@@ -24,51 +24,16 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
 
   after { FileUtils.rm_rf(tmpdir) }
 
-  describe "#copy_concern" do
-    before { generator.copy_concern }
+  describe "#create_initializer" do
+    before { generator.create_initializer }
 
-    it "creates json_web_key.rb in app/controllers/concerns/" do
-      expect(File).to exist(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
+    it "creates jwks_provider.rb in config/initializers/" do
+      expect(File).to exist(File.join(tmpdir, "config/initializers/jwks_provider.rb"))
     end
 
-    it "includes the JsonWebKey module" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("module JsonWebKey")
-    end
-
-    it "includes sig_key_set method" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("def sig_key_set")
-    end
-
-    it "includes signing_key method" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("def signing_key")
-    end
-
-    it "includes encryption_key method" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("def encryption_key")
-    end
-
-    it "does not contain raw ERB tags in the output" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).not_to include("<%=")
-    end
-
-    it "interpolates app_name into kid_sig_key" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("alias/my-app-id-token-")
-    end
-
-    it "includes kid_sig_key referencing signing-key-kms-asymmetric-key" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("signing-key-kms-asymmetric-key")
-    end
-
-    it "includes kid_enc_key referencing encryption-key-kms-asymmetric-key" do
-      content = File.read(File.join(tmpdir, "app/controllers/concerns/json_web_key.rb"))
-      expect(content).to include("encryption-key-kms-asymmetric-key")
+    it "sets JwksProvider.app_name" do
+      content = File.read(File.join(tmpdir, "config/initializers/jwks_provider.rb"))
+      expect(content).to include("JwksProvider.app_name = \"my-app\"")
     end
   end
 
@@ -79,14 +44,14 @@ RSpec.describe JwksProvider::Generators::InstallGenerator do
       expect(File).to exist(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
     end
 
-    it "includes JsonWebKey concern" do
+    it "includes JwksProvider::JsonWebKey concern" do
       content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
-      expect(content).to include("include JsonWebKey")
+      expect(content).to include("include JwksProvider::JsonWebKey")
     end
 
-    it "renders sig_key_set as JSON" do
+    it "renders keys_set as JSON" do
       content = File.read(File.join(tmpdir, "app/controllers/jwks_controller.rb"))
-      expect(content).to include("render json: sig_key_set")
+      expect(content).to include("render json: keys_set")
     end
 
     it "defines JwksController" do
