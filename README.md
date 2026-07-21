@@ -71,15 +71,15 @@ Sets the application name used in KID aliases:
 JwksProvider.app_name = "my-app"
 ```
 
-### `app/controllers/jwks_controller.rb`
+### `app/controllers/well_known_controller.rb`
 
 Serves the public key set at `/.well-known/jwks`:
 
 ```ruby
-class JwksController < ApplicationController
+class WellKnownController < ApplicationController
   include JwksProvider::JsonWebKey
 
-  def index
+  def jwks
     render json: keys_set
   end
 end
