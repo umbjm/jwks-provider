@@ -1,6 +1,6 @@
 # jwks-provider
 
-A Rails gem for managing **JWKS (JSON Web Key Set)** operations. It generates EC (prime256v1) key pairs for **staging** and **production** environments, exposes a `JsonWebKey` controller concern, and automatically wires up the `/.well-known/jwks` endpoint.
+A Rails gem for managing **JWKS (JSON Web Key Set)** operations. It generates EC (prime256v1) key pairs for **staging** and **production** environments, provides a `JwksProvider::JsonWebKey` module that can be included directly in controllers, and automatically wires up the `/.well-known/jwks` endpoint.
 
 Built on top of [`jwt`](https://rubygems.org/gems/jwt) and [`jose`](https://rubygems.org/gems/jose), both of which are automatically required in your app once this gem is loaded — no need to add them to your app's `Gemfile` separately.
 
@@ -38,7 +38,7 @@ You can also pass it directly to skip the prompt:
 rails generate jwks_provider:install --app-name my-app
 ```
 
-The app name is embedded into the generated `JsonWebKey` concern:
+The app name is stored in an initializer and used to build KID aliases at runtime:
 
 ```ruby
 "alias/my-app-id-token-stg-signing-key-kms-asymmetric-key"
@@ -47,9 +47,10 @@ The app name is embedded into the generated `JsonWebKey` concern:
 
 This single command will:
 
-1. **Copy `app/controllers/concerns/json_web_key.rb`** — a ready-to-include controller concern with your app name baked in.
-2. **Copy `app/controllers/jwks_controller.rb`** — serves the public JWKS payload.
-3. **Inject route** — adds `get ".well-known/jwks", to: "jwks#index"` into `config/routes.rb`.
+1. **Generate EC key pairs** — creates `config/keys/enc_key_stg.pem`, `config/keys/sig_key_stg.pem`, `config/keys/enc_key_prd.pem`, and `config/keys/sig_key_prd.pem`.
+2. **Create `config/initializers/jwks_provider.rb`** — sets `JwksProvider.app_name` with your app name.
+3. **Copy `app/controllers/jwks_controller.rb`** — serves the public JWKS payload.
+4. **Inject route** — adds `get ".well-known/jwks", to: "jwks#index"` into `config/routes.rb`.
 
 ## Generated Files
 
@@ -57,24 +58,51 @@ This single command will:
 
 | File | Description |
 |------|-------------|
-| `staging/enc_key.pem`    | EC prime256v1 private key for staging |
-| `staging/sig_key.pem`     | EC prime256v1 public key for staging |
-| `production/enc_key.pem` | EC prime256v1 private key for production |
-| `production/sig_key.pem`  | EC prime256v1 public key for production |
+| `enc_key_stg.pem` | EC prime256v1 private key for staging |
+| `sig_key_stg.pem` | EC prime256v1 public key for staging |
+| `enc_key_prd.pem` | EC prime256v1 private key for production |
+| `sig_key_prd.pem` | EC prime256v1 public key for production |
 
-### `app/controllers/concerns/json_web_key.rb`
+### `config/initializers/jwks_provider.rb`
 
-Include this concern in any controller that needs to verify JWTs:
+Sets the application name used in KID aliases:
 
 ```ruby
-class ApiController < ApplicationController
-  include JsonWebKey
-end
+JwksProvider.app_name = "my-app"
 ```
 
 ### `app/controllers/jwks_controller.rb`
 
-Serves the public key set at `/.well-known/jwks`. No additional configuration needed.
+Serves the public key set at `/.well-known/jwks`:
+
+```ruby
+class JwksController < ApplicationController
+  include JwksProvider::JsonWebKey
+
+  def index
+    render json: keys_set
+  end
+end
+```
+
+## Usage
+
+Include `JwksProvider::JsonWebKey` in any controller that needs to expose JWKS:
+
+```ruby
+class ApiController < ApplicationController
+  include JwksProvider::JsonWebKey
+end
+```
+
+### Key loading
+
+- **Signing key** — read from `config/keys/sig_key_#{kid_alias}.pem` (e.g. `sig_key_stg.pem` in non-production, `sig_key_prd.pem` in production).
+- **Encryption key** — read from the `ENC_KEY` environment variable. Make sure to set this in your environment:
+
+```bash
+export ENC_KEY="-----BEGIN EC PRIVATE KEY-----\n..."
+```
 
 ## Development
 
